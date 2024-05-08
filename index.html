@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wijit-Menu</title>
+    <script type="module" src="extra/scripts.js"></script>
+    <script type="module" src="src/wijit-menu.js"></script>
+    <link rel="stylesheet" href="extra/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Wijit-Menu</h1>
+        <strong>A Web Component that displays various menu styles from <code>menu</code> and <code>ul</code> lists.</strong>
+    </header>
+
+    <details id="instructions">
+        <summary>Readme</summary>
+        <div></div>
+    </details>
+
+    <section id="demo-form">
+    </section>
+
+    <section id="demo">
+    </section>
+
+    <section id="demo-changes"></section>
+
+    <h2>Examples</h2>
+    <section>
+        <div class="card">
+            <!-- <wijit-menu>
+                <menu>
+                    <li><a href="#">Level One - One</a></li>
+                    <li>
+                        <label>
+                            Level One - Two
+                            <input hidden type="checkbox">
+                        </label>
+                        <menu>
+                            <li><a href="#">Level Two - One</a></li>
+                            <li><a href="#">Level Two - Two</a></li>
+                            <li><a href="#">Level Two - Three</a></li>
+                        </menu>
+                    </li>
+                </menu>
+            </wijit-menu> -->
+        </div>
+    </section>
+
+    <section>
+        <wijit-menu active class="oldschool">
+            <ul>
+                <li><a href="#">Level One - One</a></li>
+                <li>
+                    Level One - Two
+                    <ul>
+                        <li><a href="#">Level Two - One</a></li>
+                        <li><a href="#">Level Two - Two</a></li>
+                        <li>
+                            <a>Level Two - Three</a>
+                            <menu>
+                                <li><a>Level 2.3.1</a></li>
+                                <li><a>Level 2.3.2</a></li>
+                                <li>
+                                    Level 2.3.3
+                                    <menu>
+                                        <li><a>Level 2.3.3.1</a></li>
+                                        <li><a>Level 2.3.3.2</a></li>
+                                        <li><a>Level 2.3.3.2</a></li>
+                                    </menu>
+                                </li>
+                            </menu>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </wijit-menu>
+    </section>
+</body>
+</html>
