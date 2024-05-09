@@ -17,7 +17,7 @@ export class WijitMenu extends HTMLElement {
   defaultStyleId = 'wijit-menu-default-styles';
 
   static allowed = {
-    custom: [null, "", "true", true, "false", false]
+    custom: new Set([null, "", "true", true, "false", false])
   };
 
   static observedAttributes = ['custom', 'height', 'speed'];
@@ -290,7 +290,8 @@ export class WijitMenu extends HTMLElement {
           background-color: var(--bg2-color);
         }
 
-        & li > menu
+        & li > menu,
+        & li > ul
         { background: var(--bg3-color); }
 
         & li:not(:has(input:checked)):hover {
@@ -312,7 +313,8 @@ export class WijitMenu extends HTMLElement {
         & li:first-child
         { border-width: 0; }
 
-        & menu
+        & menu,
+        & ul
         { border-radius: 1rem 0 0 1rem; }
 
         & li li:first-child
@@ -436,8 +438,10 @@ export class WijitMenu extends HTMLElement {
           overflow: hidden;
         }
 
-        & label:has(input:checked) + ul,
-        & label:has(input:checked) + menu {
+        & label:has(input:checked) + menu,
+        & label:has(input:checked) + ul
+        {
+          outline: 1px solid lime;
           flex: 2;
           max-height: 1000vh;
           opacity: 1;
@@ -455,7 +459,7 @@ export class WijitMenu extends HTMLElement {
           position: relative;
         }
 
-        & li > menu
+        & li > menu,
         & li > ul
         {
           max-height: 0%;
@@ -479,7 +483,9 @@ export class WijitMenu extends HTMLElement {
         }
       } /** wijit-menu **/
 
-      wijit-menu.inset li > menu {
+      wijit-menu.inset li > menu,
+      wijit-menu.inset li > ul
+      {
         box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5);
       }
 
@@ -509,17 +515,23 @@ export class WijitMenu extends HTMLElement {
           border-radius: 0 1rem 0 0;
         }
 
-        & menu label:has(input:checked) {
+        & menu label:has(input:checked),
+        & ul label:has(input:checked)
+        {
           background-color: var(--bg2-color);
           border-radius: 1rem;
         }
 
-        & menu label:has(input:checked)::after {
+        & menu label:has(input:checked)::after,
+        & label label:has(input:checked)::after
+        {
           background-color: var(--bg3-color);
           border-radius: 1rem 0 0 0;
         }
 
-        & menu label:has(input:checked)::before {
+        & menu label:has(input:checked)::before,
+        & ul label:has(input:checked)::before
+        {
           background-color: var(--bg3-color);
           border-radius: 0 0 0 .5rem;
         }
@@ -553,20 +565,25 @@ export class WijitMenu extends HTMLElement {
           border-width: 0;
         }
 
-        & label:has(input:checked) + menu,
-        & li:has(label):hover > menu {
+        /*& label:has(input:checked) + menu,
+        & label:has(input:checked) + ul,
+        & li:hover > ul,
+        & li:has(label):hover > menu,
+        & li:has(label):hover > ul
+        {
           border: 1px solid var(--border-color);
           max-height: 1000vh;
           overflow: visible;
           z-index: 100;
-        }
+        }*/
 
-        & li:has(label):hover > label > input[type=checkbox],
+        /*& li:has(label):hover > label > input[type=checkbox],
         & li:has(label):hover > label > input[type=radio] {
           transform: rotate(90deg);
-        }
+        }*/
 
-        & label + menu
+        & label + menu,
+        & label + ul
         {
           left: 0;
           max-height: 0;
@@ -577,12 +594,16 @@ export class WijitMenu extends HTMLElement {
           z-index: -1;
         }
 
-        & li > menu > li {
+        & li > menu > li,
+        & li > ul > li
+        {
           width: max-content;
           min-width: auto;
         }
 
-        & menu {
+        & ul,
+        & menu
+        {
           border-radius: 1rem;
           display: flex;
           flex-wrap: wrap;
@@ -590,9 +611,9 @@ export class WijitMenu extends HTMLElement {
           box-shadow: 2px 2px 10px black;
         }
 
-        & menu > li {
-          position: static;
-        }
+        & menu > li,
+        & ul > li
+        { position: static; }
       } /** wijit-menu.ribbon **/
 
       wijit-menu.oldschool {
@@ -624,7 +645,10 @@ export class WijitMenu extends HTMLElement {
         }
 
         & label:has(input:checked) + menu,
-        & li:has(label):hover > menu {
+        & label:has(input:checked) + ul,
+        & li:has(label):hover > menu,
+        & li:has(label):hover > ul
+        {
           border: 1px solid var(--border-color);
           max-height: 1000vh;
           overflow: visible;
@@ -636,7 +660,9 @@ export class WijitMenu extends HTMLElement {
           transform: rotate(90deg);
         }
 
-        & li > menu {
+        & li > menu,
+        & li > ul
+        {
           left: 0;
           max-height: 0;
           min-width: 100%;
@@ -646,21 +672,29 @@ export class WijitMenu extends HTMLElement {
           z-index: -1;
         }
 
-        & li > menu > li {
+        & li > menu > li,
+        & li > ul > li
+        {
           border-radius: 0;
         }
 
-        & li > menu > li > menu {
+        & li > menu > li > menu,
+        & li > ul > li > ul
+        {
           left: 100%;
           top: -100%;
         }
 
-        & menu {
+        & menu,
+        & ul
+        {
           border-radius: 1rem;
           box-shadow: 2px 2px 10px black;
         }
 
-        & menu > li {
+        & menu > li,
+        & menu > ul
+        {
           position: relative;
           overflow: visible;
         }
