@@ -7,27 +7,610 @@
  */
 
 export class WijitMenu extends HTMLElement {
-  #custom = false;
-  #speed = '.75s';
-  #height = '45px';
+  /**
+   * @private
+   */
   #expand = false;
 
+  /**
+   * @private
+   */
+  #height = 'auto';
+
+  /**
+   * @private
+   */
+  #speed = '.5s';
+
+  /**
+   * @private
+   */
+  #type = 'default';
+
+  /**
+   * @private
+   */
   #abortController = new AbortController();
+
+  /**
+   * @private
+   */
+  #inputs = new Set();
+
+  /**
+   * @private
+   */
   #observer;
 
-  defaultStyleId = 'wijit-menu-default-styles';
-
+  /**
+   * @static
+   * @typedef {Set<string | boolean | null>} AllowedValues
+   * @type {Record<string, AllowedValues>}
+   */
   static allowed = {
-    custom: new Set([null, "", "true", true, "false", false]),
     expand: new Set([null, "", "true", true, "false", false]),
+    type: new Set([null, "", "custom","oldschool", "ribbon", "sitemap"])
   };
 
-  static observedAttributes = ['custom', 'expand', 'height', 'speed'];
+  /**
+   * @static
+   * @type {string[]}
+   */
+  static observedAttributes = ['expand', 'height', 'speed', 'type'];
+
   /**
    * @constructor
    */
   constructor() {
     super();
+    this.attachShadow( {mode:'open'} );
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          --bg1-color: transparent;
+          --bg2-color: whitesmoke;
+          --bg3-color: white;
+          --border-color: silver;
+          --text-color: rgb(60,60,60);
+          --accent: skyblue;
+          --menu-height: ${this.height};
+          --speed: ${this.speed};
+
+          width: 100%;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :host {
+            --bg1-color: transparent;
+            --bg2-color: rgb(40,40,40);
+            --bg3-color: rgb(60, 60, 60);
+            --border-color: dimgray;
+            --text-color: rgb(240, 240, 240);
+            --accent: dodgerblue;
+          }
+        }
+
+        @media (pointer: fine) {
+          .ribbon li:hover > label input[type=checkbox],
+          .ribbon li:hover > label input[type=radio],
+          .oldschool li:hover > label input[type=checkbox],
+          .oldschool li:hover > label input[type=radio]
+          { transform: rotate(90deg); }
+
+          .ribbon li:has(label):hover > ul,
+          .ribbon li:has(label):hover > menu,
+          .oldschool li:has(label):hover > ul,
+          .oldschool li:has(label):hover > menu
+          {
+            flex: 1;
+            max-height: 300vh;
+            overflow: visible;
+            z-index: 1;
+          }
+        }
+
+        @media all and (max-width: 500px) {
+          a,
+          label,
+          ul,
+          menu
+          { width: 100%; }
+
+          li
+          { flex-direction: column; }
+
+          ul,
+          menu,
+          li:first-child,
+          li:last-child
+          { border-radius: 0 }
+
+          .oldschool li
+          { position: static; }
+
+          .oldschool
+          { position: relative; }
+
+          .oldschool li > menu,
+          .oldschool li > ul
+          {
+            left: 0;
+            top: 100%;
+            width: 100%;
+          }
+
+          .oldschool li li > menu,
+          .oldschool li li > ul {
+            left: 0;
+            top: 100%;
+          }
+        }
+
+        @media all and (min-width: 501px) {
+          ul ul,
+          menu menu
+          { border-radius: 1rem 0 0 1rem; }
+
+          li:first-child
+          { border-radius: 1rem 0 0 0; }
+
+          li:last-child
+          { border-radius: 0 0 0 1rem; }
+
+          .oldschool li
+          { position: relative; }
+
+          .oldschool li > menu,
+          .oldschool li > ul {
+            top: 99%;
+            width: max-content;
+          }
+
+          .oldschool li li > menu,
+          .oldschool li li > ul {
+            left: 100%;
+            top: 0;
+          }
+        }
+
+        .default {
+
+        /****** Backgrounds ******/
+          background-color: var(--bg1-color);
+
+          li menu,
+          li ul,
+          li menu menu menu,
+          li ul ul ul
+          { background-color: var(--bg3-color) }
+
+          li menu menu,
+          li ul ul
+          { background-color: var(--bg2-color) }
+
+          li:not(:has(input:checked)):hover
+          {
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+          }
+
+          li:not(:has(input:checked)):active
+          {
+            background-image: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+          }
+
+        /****** Borders ******/
+
+          label > a
+          { border: 1px dotted var(--border-color); }
+
+          li > menu,
+          li > ul
+          { border: solid var(--border-color); }
+
+          li
+          { border: solid var(--border-color); }
+
+          li > menu,
+          li > ul
+          { border-width: 0; }
+
+          li,
+          label:has(input:checked) + menu li
+          { border-width: 1px 0 0 0; }
+
+          li:first-child
+          { border-width: 0; }
+
+        /****** Text ******/
+
+          a,
+          input[type=checkbox],
+          input[type=radio]
+          { color: var(--text-color) }
+
+          a:hover,
+          label:hover,
+          label:hover > a,
+          label:hover input
+          { color: var(--accent); }
+
+          a,
+          input[type=checkbox],
+          input[type=radio],
+          label
+          { font-weight: bold; }
+
+          input[type=checkbox],
+          input[type=radio]
+          { font-size: 1.5rem }
+
+          a
+          { text-decoration: none }
+
+          a:hover
+          { text-decoration: underline; }
+
+        /****** Shadows ******/
+
+          li > menu,
+          li > ul
+          { box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); }
+
+          a[href]:active {
+            box-shadow: inset 1px 1px 5px black;
+          }
+
+        /****** Cursors ******/
+
+            li,
+            label,
+            input[type=checkbox],
+            input[type=radio]
+            { cursor: pointer }
+
+        /****** Structure ******/
+          width: 100%;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+
+          a {
+            text-align: left;
+            flex: 1;
+            padding: .5rem;
+            min-width: max-content;
+          }
+
+          input[type=checkbox],
+          input[type=radio] {
+            appearance: none;
+            aspect-ratio: 1/1;
+            display: inline-block;
+            margin: .5rem;
+            position: relative;
+            transition: all .25s;
+            vertical-align: middle;
+            width: 1.5rem;
+          }
+
+          input[type=checkbox]:checked,
+          input[type=radio]:checked
+          { transform: rotate(90deg); }
+
+          input[type=checkbox]:before,
+          input[type=radio]:before {
+            align-items: center;
+            content: "▶";
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+          }
+
+          label a { flex:0 }
+
+          label {
+            align-items: center;
+            display: flex;
+            flex: 2;
+            justify-content: start;
+            padding: 0 .5rem;
+            transition: all var(--speed);
+          }
+
+          label:has(input:checked) {
+            align-self: stretch;
+            flex: 0;
+          }
+
+          label:has(input) + menu,
+          label:has(input) + ul {
+            flex: 0;
+            max-height: 0vh;
+          }
+
+          label:has(input:checked) + menu,
+          label:has(input:checked) + ul {
+            flex: 2;
+            max-height: 300vh;
+            z-index: 1;
+          }
+
+          li {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex;
+            min-height: var(--menu-height);
+          }
+
+          li:not(:has(label)) {
+            padding: 0 1rem;
+          }
+
+          menu,
+          ul {
+            display: flex;
+            flex-direction: column;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            flex: 0;
+            transition: all var(--speed);
+          }
+
+          menu menu,
+          ul ul {
+            max-height: 0vh;
+          }
+
+        &.inset {
+
+          li > menu,
+          li > ul
+          { box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5); }
+
+        } /** .inset **/
+
+        &.ribbon {
+
+          /****** Borders ******/
+
+            & li
+            { border-width: 0 0 0 1px; }
+
+            & > ul,
+            & > menu,
+            & li > ul,
+            & li > menu,
+            & li:first-child
+            { border-width: 0; }
+
+            & li:has(label):hover > menu,
+            & li:has(label):hover > ul,
+            & label:has(input:checked) + menu,
+            & label:has(input:checked) + ul
+            { border: 1px solid var(--border-color); }
+
+            & li,
+            & li li:first-child
+            { border-radius: 0 }
+
+            & menu,
+            & ul
+            { border-radius: .5rem }
+
+            & > menu > li:first-child,
+            & > ul > li:first-child
+            { border-radius: .5rem 0 0 .5rem }
+
+            & > menu > li:last-child,
+            & > ul > li:last-child
+            { border-radius: 0 .5rem .5rem 0 }
+
+          /****** Structure ******/
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+
+            & label {
+              flex: 1;
+              justify-content: center;
+            }
+
+            & label:has(input):hover,
+            & label:has(input:checked)
+            { flex: 1; }
+
+            & label:has(input:checked) + menu,
+            & label:has(input:checked) + ul
+            {
+              flex: 1;
+              max-height: 300vh;
+              overflow: visible;
+              z-index: 1;
+            }
+
+            & li > menu,
+            & li > ul {
+              left: 0;
+              overflow: hidden;
+              position: absolute;
+              top: 99%;
+              width: 100%;
+            }
+
+            & menu,
+            & ul
+            {
+              display: flex;
+              flex-direction: row;
+              flex-wrap: wrap;
+              justify-content: center;
+              overflow: visible;
+              position: relative;
+            }
+
+        } /** .ribbon **/
+
+        &.oldschool {
+
+          /****** Borders ******/
+
+            & li:has(label):hover > menu,
+            & li:has(label):hover > ul,
+            & label:has(input:checked) + menu,
+            & label:has(input:checked) + ul
+            { border: 1px solid var(--border-color); }
+
+            & > menu > li,
+            & > ul > li
+            { border-width: 0 0 0 1px; }
+
+            & li
+            { border-width: 0 0 1px 0; }
+
+            & > ul,
+            & > menu,
+            & li > ul,
+            & li > menu,
+            & > menu > li:first-child,
+            & > ul > li:first-child
+            { border-width: 0; }
+
+            & li,
+            & li li:first-child
+            { border-radius: 0 }
+
+            & > menu > li:first-child,
+            & > ul > li:first-child
+            { border-radius: .5rem 0 0 .5rem }
+
+            & > menu > li:last-child,
+            & > ul > li:last-child
+            { border-radius: 0 .5rem .5rem 0 }
+
+            & menu,
+            & ul
+            { border-radius: .5rem }
+
+          /****** Structure ******/
+
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+
+            & label {
+              flex: 1;
+              justify-content: start;
+            }
+
+            & label:has(input):hover,
+            & label:has(input:checked)
+            { flex: 1; }
+
+            & label:has(input:checked) + menu,
+            & label:has(input:checked) + ul
+            {
+              flex: 1;
+              max-height: 300vh;
+              overflow: visible;
+            }
+
+            & li > menu,
+            & li > ul {
+              flex-direction: column;
+              overflow: hidden;
+              position: absolute;
+              z-index: 1;
+            }
+
+            & > menu,
+            & > ul {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              overflow: visible;
+              flex-direction: row;
+            }
+
+        } /** .oldschool **/
+
+        } /** default **/
+
+        .sitemap {
+          --height: var(--menu-height);
+
+          /**** Borders ****/
+            border-radius: 0;
+
+            & li,
+            & li > ul,
+            & li > menu,
+            & label > a
+            {
+              border: none;
+              border-radius: 0;
+            }
+
+          /**** Text ****/
+            a
+            { color: var(--text-color); }
+
+            a:hover
+            { color: var(--accent); }
+
+          /**** Shadows ****/
+            li > menu,
+            li > ul,
+            a[href]:active
+          { box-shadow: none }
+
+          /**** Structure ****/
+
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+          gap: 1rem;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          width: 100%;
+
+          & input {
+            display: none;
+          }
+
+          & menu {
+            border: 1px dotted var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            max-height: var(--height);
+            width: max-content;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+              gap: .5rem;
+          }
+
+          & menu menu {
+              border: none;
+          }
+
+          & menu menu menu {
+            display: block;
+          }
+        }
+      </style>
+      <slot></slot>
+    `;
   }
 
   connectedCallback() {
@@ -36,8 +619,9 @@ export class WijitMenu extends HTMLElement {
       this.observeMenu(records)
     });
 
-    if (!this.custom) this.addDefaultStyles();
     this.init();
+    this.addDocumentClickHandler();
+    this.addListeners();
 
     // observe must happen after init()
     this.#observer.observe(this, options);
@@ -66,10 +650,11 @@ export class WijitMenu extends HTMLElement {
   }
 
   /**
-   * Observe menu items for changes.
-   * If something is added, check all additions for <li> elements.
-   * If <li> elements are found, for each <li> add a label if needed.
-   * @param  {[type]} records  [description]
+   * Observes menu items for changes.
+   * If something is added, check all additions for `<li>` elements.
+   * If `<li>` elements are found, for each `<li>` add a label if needed.
+   *
+   * @param {MutationRecord[]} records  - An array of MutationRecord objects.
    *
    * @test const li = document.createElement('li');
       li.innerHTML = '<a>bar</a><menu><li><a>baz</a></li></menu>';
@@ -89,13 +674,21 @@ export class WijitMenu extends HTMLElement {
   }
 
   /**
-   * Scan for <li> elements.
-   * For each <li>, call hasChildMenu() to check if the <li> has a child <menu> or <ul>.
-   * If yes, call hasLabel() to check if <li> has a label element.
-   * If hasLabel() returns false, call addLabel().
+   * Initializes the menu based on the `type` attribute.
    */
   init() {
-    const lis = this.querySelectorAll('li');
+    let lis;
+    this.children[0].setAttribute('tabindex', '0');
+
+    if (this.type === 'custom') {
+      lis = this.querySelectorAll('li');
+    } else {
+      this.shadowRoot.append(this.children[0]);
+      const elem = this.shadowRoot.querySelector('menu, ul');
+      this.replaceClassName(this.type);
+      lis = this.shadowRoot.querySelectorAll('li');
+    }
+
     for (const li of lis) {
       if (this.hasChildMenu(li)) {
         if (!this.hasLabel(li)) this.addLabel(li);
@@ -151,8 +744,10 @@ export class WijitMenu extends HTMLElement {
   }
 
   /**
-   * Prepend label to li element and move li element's first text node to the label.
-   * @param {HTMLLIElement} li An li element
+   * Prepend label with checkbox to li element and move li element's first text node into the label.
+   *
+   * @param {HTMLLIElement} li  - An `<li>` element
+   * @returns {HTMLLIElement} The modified `<li>` element.
    *
    * @test const li = document.createElement('li');
       li.innerHTML = '<a>foo</a>';
@@ -170,6 +765,7 @@ export class WijitMenu extends HTMLElement {
     input.type = "checkbox";
     input.name = 'wm-checkbox';
     input.setAttribute('hidden', true);
+    this.#inputs.add(input);
     if (this.expand) input.checked = true;
     label.append(input);
     label.append(node);
@@ -207,35 +803,73 @@ export class WijitMenu extends HTMLElement {
   }
 
   /**
-   * Add click and blur event listener to menu. If blur, or click target is a link, remove the 'active' attribute.
+   * Add event listener to menu. If click target is a link, close the menu.
    */
   addListeners() {
-    this.addEventListener('click', event => {
-      if (event.target.localName === 'a') this.removeAttribute('active');
-    }, { signal:this.#abortController.signal } );
+    if (this.type === "custom") {
+      this.addEventListener('click', event => {
+        if (event.target.localName === 'a') this.closeMenu();
+      }, { signal:this.#abortController.signal } );
+    } else {
+      this.shadowRoot.addEventListener('click', event => {
+        if (event.target.localName === 'a') this.closeMenu();
+      }, { signal:this.#abortController.signal } );
+    }
+  }
 
-    this.addEventListener('blur', event => {
-      this.removeAttribute('active');
+  /**
+   * Add click event listener to document.body. If target is not in the menu, close the menu.
+   */
+  addDocumentClickHandler() {
+    document.body.addEventListener('click', event => {
+      if (!!!event.target.closest(this.localName)) {
+        this.closeMenu();
+      }
     }, { signal:this.#abortController.signal });
   }
 
   /**
-   * Add click event listener to document.body. If target is not in the menu, remove the 'active' attribute.
-   * @returns {[type]} [description]
+   * Sets all checkboxes in the menu to unchecked.
    */
-  addDocumentClickHandler() {
-    document.body.addEventListener('click', event => {
-      if (!!event.target.closest(this.localName)) this.removeAttribute('active');
-    }, { signal:this.#abortController.signal });
+  closeMenu() {
+    for (const input of this.#inputs) {
+      input.checked = false;
+    }
   }
 
+  /**
+   * Replaces the current menu style class with the  provided class name.
+   *
+   * @param {string} value  - The new class name for the menu style.
+   */
+  replaceClassName(value) {
+    const elem = this.shadowRoot.querySelector('menu, ul');
+    if (!elem) return false;
+    if (value !== 'sitemap') elem.classList.add('default');
+    for (const style of WijitMenu.allowed.type) {
+      if (elem.classList.contains(style)) {
+        elem.classList.replace(style, value);
+      } else {
+        elem.classList.add(value);
+      }
+    }
+  }
+
+  /**
+   * Logs an error message to the console.
+   *
+   * @param {string} msg  - The error message.
+   * @param {*} value     - The value that caused the error.
+   * @memberof WijitMenu
+   */
   sendError(msg, value) {
     console.error(`${msg}. Value given was ${value}`);
     return false;
   }
 
   /**
-   * @private
+   * Dispatches a custom event `wijitChanged` with details about the attribute change.
+   *
    * @param {string} attr
    * @param {*} oldval
    * @param {*} newval
@@ -244,577 +878,6 @@ export class WijitMenu extends HTMLElement {
     const info = { attr:attr, old:oldval, new:newval };
     const evt = new CustomEvent('wijitChanged', { detail:info });
     window.dispatchEvent(evt);
-  }
-
-  addDefaultStyles() {
-    const style = document.head.querySelector(`#${this.defaultStyleId}`);
-    if (!style) document.head.append(this.defaultStyles());
-  }
-
-  removeDefaultStyles() {
-    const style = document.head.querySelector(`#${this.defaultStyleId}`);
-    if (style) style.remove();
-  }
-
-  /**
-   * Default menu styles
-   * @returns {HTMLStyleElement} A <style> element containing the default menu styles
-   */
-  defaultStyles() {
-    const style = document.createElement('style');
-    style.id = this.defaultStyleId;
-    style.textContent = `
-      @layer wijit-menu {
-      wijit-menu {
-        --bg1-color: rgb(250, 250, 250);
-        --bg2-color: whitesmoke;
-        --bg3-color: white;
-        --border-color: silver;
-        --text-color: rgb(60,60,60);
-        --accent: skyblue;
-        --accent-text: rgb(40, 40, 40);
-        --menu-height: ${this.height};
-        --speed: ${this.speed};
-      }
-
-      @media (prefers-color-scheme: dark) {
-        wijit-menu {
-          --bg1-color: transparent;
-          --bg2-color: rgb(40,40,40);
-          --bg3-color: rgb(60, 60, 60);
-          --border-color: dimgray;
-          --text-color: rgb(240, 240, 240);
-          --accent: dodgerblue;
-          --accent-text: white;
-        }
-      }
-
-      @media (pointer: fine) {
-        wijit-menu.ribbon li:hover > label input[type=checkbox],
-        wijit-menu.ribbon li:hover > label input[type=radio],
-        wijit-menu.oldschool li:hover > label input[type=checkbox],
-        wijit-menu.oldschool li:hover > label input[type=radio]
-        { transform: rotate(90deg); }
-
-        wijit-menu.ribbon li:has(label):hover > ul,
-        wijit-menu.ribbon li:has(label):hover > menu,
-        wijit-menu.oldschool li:has(label):hover > ul,
-        wijit-menu.oldschool li:has(label):hover > menu
-        {
-          flex: 1;
-          max-height: 300vh;
-          overflow: visible;
-          z-index: 1;
-        }
-      }
-
-      @media all and (max-width: 500px) {
-        wijit-menu a,
-        wijit-menu label,
-        wijit-menu ul,
-        wijit-menu menu
-        { width: 100%; }
-
-        wijit-menu li
-        { flex-direction: column; }
-
-        wijit-menu ul,
-        wijit-menu menu,
-        wijit-menu li:first-child,
-        wijit-menu li:last-child
-        { border-radius: 0 }
-
-        wijit-menu.oldschool li
-        { position: static; }
-
-        wijit-menu.oldschool
-        { position: relative; }
-
-        wijit-menu.oldschool li > menu,
-        wijit-menu.oldschool li > ul
-        {
-          left: 0;
-          top: 100%;
-          width: 100%;
-        }
-
-        wijit-menu.oldschool li li > menu,
-        wijit-menu.oldschool li li > ul {
-          left: 0;
-          top: 100%;
-        }
-      }
-
-      @media all and (min-width: 501px) {
-        wijit-menu ul,
-        wijit-menu menu
-        { border-radius: 1rem 0 0 1rem; }
-
-        wijit-menu li:first-child
-        { border-radius: 1rem 0 0 0; }
-
-        wijit-menu li:last-child
-        { border-radius: 0 0 0 1rem; }
-
-        wijit-menu.oldschool li
-        { position: relative; }
-
-        wijit-menu.oldschool li > menu,
-        wijit-menu.oldschool li > ul {
-          top: 99%;
-          width: max-content;
-        }
-
-        wijit-menu.oldschool li li > menu,
-        wijit-menu.oldschool li li > ul {
-          left: 100%;
-          top: 0;
-        }
-      }
-
-      wijit-menu {
-
-      /****** Backgrounds ******/
-        background-color: var(--bg1-color);
-
-        & li menu,
-        & li ul,
-        & li menu menu menu,
-        & li ul ul ul
-        { background-color: var(--bg3-color) }
-
-        & li menu menu,
-        & li ul ul
-        { background-color: var(--bg2-color) }
-
-        & li:not(:has(input:checked)):hover
-        {
-          background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
-        }
-
-        & li:not(:has(input:checked)):active
-        {
-          background-image: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
-        }
-
-      /****** Borders ******/
-
-        & label > a
-        { border: 1px dotted var(--border-color); }
-
-        & li > menu,
-        & li > ul
-        { border: solid var(--border-color); }
-
-        & li
-        { border: solid var(--border-color); }
-
-        & li > menu,
-        & li > ul
-        { border-width: 0; }
-
-        & li,
-        & label:has(input:checked) + menu li
-        { border-width: 1px 0 0 0; }
-
-        & li:first-child
-        { border-width: 0; }
-
-      /****** Text ******/
-
-        & a,
-        & input[type=checkbox],
-        & input[type=radio]
-        { color: var(--text-color) }
-
-        & a:hover,
-        & label:hover,
-        & label:hover > a,
-        & label:hover input
-        { color: var(--accent); }
-
-        & a,
-        & input[type=checkbox],
-        & input[type=radio],
-        & label
-        { font-weight: bold; }
-
-        & input[type=checkbox],
-        & input[type=radio]
-        { font-size: 1.5rem }
-
-        & a
-        { text-decoration: none }
-
-        & a:hover
-        { text-decoration: underline; }
-
-      /****** Shadows ******/
-
-        & li > menu,
-        & li > ul
-        { box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); }
-
-        & a[href]:active {
-          box-shadow: inset 1px 1px 5px black;
-        }
-
-      /****** Cursors ******/
-
-          & li,
-          & label,
-          & input[type=checkbox],
-          & input[type=radio]
-          { cursor: pointer }
-
-      /****** Structure ******/
-        width: 100%;
-
-        & a {
-          text-align: left;
-          flex: 1;
-          padding: .5rem;
-          min-width: max-content;
-        }
-
-        & input[type=checkbox],
-        & input[type=radio] {
-          appearance: none;
-          aspect-ratio: 1/1;
-          display: inline-block;
-          margin: .5rem;
-          position: relative;
-          transition: all .25s;
-          vertical-align: middle;
-          width: 1.5rem;
-        }
-
-        & input[type=checkbox]:checked,
-        & input[type=radio]:checked
-        { transform: rotate(90deg); }
-
-        & input[type=checkbox]:before,
-        & input[type=radio]:before {
-          align-items: center;
-          content: "▶";
-          display: flex;
-          justify-content: center;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
-
-        & label a { flex:0 }
-
-        & label {
-          align-items: center;
-          display: flex;
-          flex: 2;
-          justify-content: start;
-          padding: 0 .5rem;
-          transition: all var(--speed);
-        }
-
-        & label:has(input:checked) {
-          align-self: stretch;
-          flex: 0;
-        }
-
-        & label:has(input) + menu,
-        & label:has(input) + ul {
-          flex: 0;
-          max-height: 0vh;
-        }
-
-        & label:has(input:checked) + menu,
-        & label:has(input:checked) + ul {
-          flex: 2;
-          max-height: 300vh;
-          z-index: 1;
-        }
-
-        & li {
-          align-items: center;
-          box-sizing: border-box;
-          display: flex;
-          min-height: var(--menu-height);
-        }
-
-        & li:not(:has(label)) {
-          padding: 0 1rem;
-        }
-
-        & menu,
-        & ul {
-          display: flex;
-          flex-direction: column;
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          overflow: hidden;
-          flex: 0;
-          transition: all var(--speed);
-        }
-
-        & menu menu,
-        & ul ul {
-          max-height: 0vh;
-        }
-
-      } /** wijit-menu **/
-
-      wijit-menu.inset {
-
-        & li > menu,
-        & li > ul
-        { box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5); }
-
-      } /** .inset **/
-
-      wijit-menu.ribbon {
-
-        /****** Borders ******/
-
-          & li
-          { border-width: 0 0 0 1px; }
-
-          & > ul,
-          & > menu,
-          & li > ul,
-          & li > menu,
-          & li:first-child
-          { border-width: 0; }
-
-          & li:has(label):hover > menu,
-          & li:has(label):hover > ul,
-          & label:has(input:checked) + menu,
-          & label:has(input:checked) + ul
-          { border: 1px solid var(--border-color); }
-
-          & li,
-          & li li:first-child
-          { border-radius: 0 }
-
-          & menu,
-          & ul
-          { border-radius: .5rem }
-
-          & > menu > li:first-child,
-          & > ul > li:first-child
-          { border-radius: .5rem 0 0 .5rem }
-
-          & > menu > li:last-child,
-          & > ul > li:last-child
-          { border-radius: 0 .5rem .5rem 0 }
-
-        /****** Structure ******/
-
-          & label {
-            flex: 1;
-            justify-content: center;
-          }
-
-          & label:has(input):hover,
-          & label:has(input:checked)
-          { flex: 1; }
-
-          & label:has(input:checked) + menu,
-          & label:has(input:checked) + ul
-          {
-            flex: 1;
-            max-height: 300vh;
-            overflow: visible;
-            z-index: 1;
-          }
-
-          & li > menu,
-          & li > ul {
-            left: 0;
-            overflow: hidden;
-            position: absolute;
-            top: 99%;
-            width: 100%;
-          }
-
-          & menu,
-          & ul
-          {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: center;
-            overflow: visible;
-            position: relative;
-          }
-
-      } /** .ribbon **/
-
-      wijit-menu.oldschool {
-
-        /****** Borders ******/
-
-          & li:has(label):hover > menu,
-          & li:has(label):hover > ul,
-          & label:has(input:checked) + menu,
-          & label:has(input:checked) + ul
-          { border: 1px solid var(--border-color); }
-
-          & > menu > li,
-          & > ul > li
-          { border-width: 0 0 0 1px; }
-
-          & li
-          { border-width: 0 0 1px 0; }
-
-          & > ul,
-          & > menu,
-          & li > ul,
-          & li > menu,
-          & > menu > li:first-child,
-          & > ul > li:first-child
-          { border-width: 0; }
-
-          & li,
-          & li li:first-child
-          { border-radius: 0 }
-
-          & > menu > li:first-child,
-          & > ul > li:first-child
-          { border-radius: .5rem 0 0 .5rem }
-
-          & > menu > li:last-child,
-          & > ul > li:last-child
-          { border-radius: 0 .5rem .5rem 0 }
-
-          & menu,
-          & ul
-          { border-radius: .5rem }
-
-        /****** Structure ******/
-          & label {
-            flex: 1;
-            justify-content: start;
-          }
-
-          & label:has(input):hover,
-          & label:has(input:checked)
-          { flex: 1; }
-
-          & label:has(input:checked) + menu,
-          & label:has(input:checked) + ul
-          {
-            flex: 1;
-            max-height: 300vh;
-            overflow: visible;
-          }
-
-          & li > menu,
-          & li > ul {
-            flex-direction: column;
-            overflow: hidden;
-            position: absolute;
-            z-index: 1;
-          }
-
-          & > menu,
-          & > ul {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            overflow: visible;
-            flex-direction: row;
-          }
-
-      } /** .oldschool **/
-
-      wijit-menu.sitemap {
-        & a {
-          display: block;
-        }
-
-        & input[type=checkbox],
-        & input[type=radio] {
-          all: initial;
-          display: none;
-        }
-
-        & input[type=checkbox]:checked,
-        & input[type=radio]:checked
-        {  }
-
-        & input[type=checkbox]:before,
-        & input[type=radio]:before {
-          all: initial;
-        }
-
-        & label a {
-          background: yellow;
-          display: block;
-        }
-
-        & label {
-          all: initial;
-          dis
-          background: tan;
-        }
-
-        & label:has(input:checked) {
-          all:initial;
-        }
-
-        & label:has(input) + menu,
-        & label:has(input) + ul {
-          all: initial;
-        }
-
-        & label:has(input:checked) + menu,
-        & label:has(input:checked) + ul {
-          all: initial;
-        }
-
-        & li {
-          all: initial;
-        }
-
-        & li:not(:has(label)) {
-          all: initial;
-        }
-
-        & menu,
-        & ul {
-          border: 1px solid lime;
-
-        }
-
-        & menu menu,
-        & ul ul {
-          border: 1px solid orange;
-        }
-      } /** .sitemap **/
-
-      } /** @layer **/
-    `;
-
-    return style;
-  }
-  get custom() { return this.#custom; }
-
-  set custom(value) {
-    switch (value) {
-      case 'false':
-      case false:
-        value = false;
-        this.removeDefaultStyles();
-        break;
-      default:
-        value = true;
-        this.addDefaultStyles();
-        break;
-    }
-
-    this.#custom = value;
   }
 
   get expand() { return this.#expand; }
@@ -846,6 +909,13 @@ export class WijitMenu extends HTMLElement {
     if (/\d+$/.test(value)) value += 's';
     this.#speed = value;
     this.style.setProperty('--speed', value);
+  }
+
+  get type() { return this.#type; }
+
+  set type(value) {
+    this.#type = value;
+    this.replaceClassName(value);
   }
 }
 
