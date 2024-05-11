@@ -1,416 +1,467 @@
+@layer wijit-menu {
+
 wijit-menu {
-/*	--bg1-color: rgb(250, 250, 250);*/
-/*  --bg2-color: #f2f2f2;*/
-/*  --bg3-color: white;*/
-/*  --border-color: silver;*/
-/*  --text-color: rgb(60,60,60);*/
-/*  --accent: skyblue;*/
-/*  --accent-text: rgb(40, 40, 40);*/
-  --menu-height: 45px;
-  --speed: .5s;
+  --bg1-color: rgb(250, 250, 250);
+  --bg2-color: whitesmoke;
+  --bg3-color: white;
+  --border-color: silver;
+  --text-color: rgb(60,60,60);
+  --accent: skyblue;
+  --accent-text: rgb(40, 40, 40);
+  --menu-height: ${this.height};
+  --speed: ${this.speed};
 }
 
 @media (prefers-color-scheme: dark) {
   wijit-menu {
-/*    --bg1-color: rgb(20, 20, 20);*/
-/*    --bg2-color: rgb(40,40,40);*/
-/*    --bg3-color: rgb(60, 60, 60);*/
-/*    --border-color: dimgray;*/
-/*    --text-color: rgb(240, 240, 240);*/
-/*    --accent: dodgerblue;*/
-/*    --accent-text: white;*/
+    --bg1-color: transparent;
+    --bg2-color: rgb(40,40,40);
+    --bg3-color: rgb(60, 60, 60);
+    --border-color: dimgray;
+    --text-color: rgb(240, 240, 240);
+    --accent: dodgerblue;
+    --accent-text: white;
+  }
+}
+
+@media (pointer: fine) {
+  wijit-menu.ribbon li:hover > label input[type=checkbox],
+  wijit-menu.ribbon li:hover > label input[type=radio],
+  wijit-menu.oldschool li:hover > label input[type=checkbox],
+  wijit-menu.oldschool li:hover > label input[type=radio]
+  { transform: rotate(90deg); }
+
+  wijit-menu.ribbon li:has(label):hover > ul,
+  wijit-menu.ribbon li:has(label):hover > menu,
+  wijit-menu.oldschool li:has(label):hover > ul,
+  wijit-menu.oldschool li:has(label):hover > menu
+  {
+    flex: 1;
+    max-height: 300vh;
+    overflow: visible;
+    z-index: 1;
+  }
+}
+
+@media all and (max-width: 500px) {
+  wijit-menu a,
+  wijit-menu label,
+  wijit-menu ul,
+  wijit-menu menu
+  { width: 100%; }
+
+  wijit-menu li
+  { flex-direction: column; }
+
+  wijit-menu ul,
+  wijit-menu menu,
+  wijit-menu li:first-child,
+  wijit-menu li:last-child
+  { border-radius: 0 }
+
+  wijit-menu.oldschool li
+  { position: static; }
+
+  wijit-menu.oldschool
+  { position: relative; }
+
+  wijit-menu.oldschool li > menu,
+  wijit-menu.oldschool li > ul
+  {
+    left: 0;
+    top: 100%;
+    width: 100%;
+  }
+
+  wijit-menu.oldschool li li > menu,
+  wijit-menu.oldschool li li > ul {
+    left: 0;
+    top: 100%;
+  }
+}
+
+@media all and (min-width: 501px) {
+  wijit-menu ul,
+  wijit-menu menu
+  { border-radius: 1rem 0 0 1rem; }
+
+  wijit-menu li:first-child
+  { border-radius: 1rem 0 0 0; }
+
+  wijit-menu li:last-child
+  { border-radius: 0 0 0 1rem; }
+
+  wijit-menu.oldschool li
+  { position: relative; }
+
+  wijit-menu.oldschool li > menu,
+  wijit-menu.oldschool li > ul {
+    top: 99%;
+    width: max-content;
+  }
+
+  wijit-menu.oldschool li li > menu,
+  wijit-menu.oldschool li li > ul {
+    left: 100%;
+    top: 0;
   }
 }
 
 wijit-menu {
 
 /****** Backgrounds ******/
-	background-color: var(--bg2-color);
+  background-color: var(--bg1-color);
 
-	& li menu,
-	& li ul,
-	& li menu menu menu,
-	& li ul ul ul
-	{ background-color: var(--bg3-color) }
+  & li menu,
+  & li ul,
+  & li menu menu menu,
+  & li ul ul ul
+  { background-color: var(--bg3-color) }
 
-	& li menu menu,
-	& li ul ul
-	{ background-color: var(--bg2-color) }
+  & li menu menu,
+  & li ul ul
+  { background-color: var(--bg2-color) }
 
   & li:not(:has(input:checked)):hover
   {
-		background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
-	}
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+  }
 
-	& li:not(:has(input:checked)):active
-	{
-		background-image: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
-	}
+  & li:not(:has(input:checked)):active
+  {
+    background-image: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+  }
 
 /****** Borders ******/
-
-	& li > menu,
-  & li > ul
-  { border: 1px solid var(--border-color); }
 
   & label > a
   { border: 1px dotted var(--border-color); }
 
   & li > menu,
   & li > ul
-  { border-radius: 1rem 0 0 1rem; }
+  { border: solid var(--border-color); }
+
+  & li
+  { border: solid var(--border-color); }
+
+  & li > menu,
+  & li > ul
+  { border-width: 0; }
+
+  & li,
+  & label:has(input:checked) + menu li
+  { border-width: 1px 0 0 0; }
 
   & li:first-child
-  { border-radius: 1rem 0 0 0; }
-
-  & li:last-child
-  { border-radius: 0 0 0 1rem; }
-
-	& li
-	{ border: solid var(--border-color); }
-
-	& li
-	{ border-width: 1px 0 0 0; }
-
-	& li:first-child
-	{ border-width: 0; }
-
-	& menu,
-	& ul
-	{ border-radius: 1rem 0 0 1rem; }
-
-	& li li:first-child
-	{ border-radius: 1rem 0 0 0; }
-
-	& li:last-child
-	{ border-radius:0 0 0 1rem }
+  { border-width: 0; }
 
 /****** Text ******/
 
-	& a,
-	& input[type=checkbox],
-	& input[type=radio]
-	{ color: var(--text-color) }
+  & a,
+  & input[type=checkbox],
+  & input[type=radio]
+  { color: var(--text-color) }
 
   & a:hover,
   & label:hover,
   & label:hover > a,
-  & label:hover input,
-  & li label:has(input:checked),
-  & li label:has(input:checked) > a,
-  & li label:has(input:checked) > input
+  & label:hover input
   { color: var(--accent); }
 
-	& a,
-	& input[type=checkbox],
-	& input[type=radio],
-	& label
-	{ font-weight: bold; }
+  & a,
+  & input[type=checkbox],
+  & input[type=radio],
+  & label
+  { font-weight: bold; }
 
-	& input[type=checkbox],
-	& input[type=radio]
-	{ font-size: 1.5rem }
+  & input[type=checkbox],
+  & input[type=radio]
+  { font-size: 1.5rem }
 
-	& a
-	{ text-decoration: none }
+  & a
+  { text-decoration: none }
 
-	& a:hover
-	{ text-decoration: underline; }
+  & a:hover
+  { text-decoration: underline; }
 
 /****** Shadows ******/
 
-	& a[href]:active {
-		box-shadow: inset 1px 1px 5px black;
-	}
+  & li > menu,
+  & li > ul
+  { box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); }
+
+  & a[href]:active {
+    box-shadow: inset 1px 1px 5px black;
+  }
 
 /****** Cursors ******/
 
-		& label,
-		& input[type=checkbox],
-		& input[type=radio]
-		{ cursor: pointer }
+    & li,
+    & label,
+    & input[type=checkbox],
+    & input[type=radio]
+    { cursor: pointer }
 
 /****** Structure ******/
-	margin: 0;
-	padding: 0;
-	width: 100%;
-
-	& a {
-		text-align: left;
-		flex: 1;
-		padding: .5rem;
-	}
-
-	& input[type=checkbox],
-	& input[type=radio] {
-		appearance: none;
-		aspect-ratio: 1/1;
-		display: inline-block;
-		margin: 1rem;
-		position: relative;
-		transition: all .25s;
-		vertical-align: middle;
-		width: 1.5rem;
-	}
-
-	& input[type=checkbox]:checked,
-	& input[type=radio]:checked
-	{ transform: rotate(90deg); }
-
-	& input[type=checkbox]:before,
-	& input[type=radio]:before {
-		align-items: center;
-		content: "▶";
-		display: flex;
-		justify-content: center;
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-	}
+  width: 100%;
 
   & a {
+    text-align: left;
     flex: 1;
+    padding: .5rem;
     min-width: max-content;
+  }
+
+  & input[type=checkbox],
+  & input[type=radio] {
+    appearance: none;
+    aspect-ratio: 1/1;
+    display: inline-block;
+    margin: .5rem;
+    position: relative;
+    transition: all .25s;
+    vertical-align: middle;
+    width: 1.5rem;
+  }
+
+  & input[type=checkbox]:checked,
+  & input[type=radio]:checked
+  { transform: rotate(90deg); }
+
+  & input[type=checkbox]:before,
+  & input[type=radio]:before {
+    align-items: center;
+    content: "▶";
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
   & label a { flex:0 }
 
-	& label {
-		align-items: center;
-		display: flex;
-		flex: 2;
-		justify-content: start;
-		transition: all var(--speed);
-	}
+  & label {
+    align-items: center;
+    display: flex;
+    flex: 2;
+    justify-content: start;
+    padding: 0 .5rem;
+    transition: all var(--speed);
+  }
 
-  & label:has(input:checked)
-	{ flex: 0; }
+  & label:has(input:checked) {
+    align-self: stretch;
+    flex: 0;
+  }
 
   & label:has(input) + menu,
-  & label:has(input) + ul
-  {
+  & label:has(input) + ul {
     flex: 0;
     max-height: 0vh;
   }
 
   & label:has(input:checked) + menu,
-  & label:has(input:checked) + ul
-  {
+  & label:has(input:checked) + ul {
     flex: 2;
     max-height: 300vh;
-    z-index: 100;
+    z-index: 1;
   }
 
-	& li {
-		display: flex;
-		min-height: var(--menu-height);
-	}
+  & li {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    min-height: var(--menu-height);
+  }
 
-	& menu,
-	& ul
-	{
-		display: flex;
-		flex-direction: column;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		transition: all .5s;
-		overflow: hidden;
-		flex: 0;
-		transition: all var(--speed);
-	}
+  & li:not(:has(label)) {
+    padding: 0 1rem;
+  }
 
-	& menu menu,
-	& ul ul {
-		max-height: 0vh;
-	}
+  & menu,
+  & ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    flex: 0;
+    transition: all var(--speed);
+  }
+
+  & menu menu,
+  & ul ul {
+    max-height: 0vh;
+  }
 
 } /** wijit-menu **/
 
 wijit-menu.inset {
 
-	& li > menu,
-	& li > ul
-	{ box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5); }
+  & li > menu,
+  & li > ul
+  { box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5); }
 
-} /** inset **/
-
-wijit-menu.inset li > menu,
-wijit-menu.inset li > ul
+} /** .inset **/
 
 wijit-menu.ribbon {
-	align-items: start;
-	background-color: transparent;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: center;
-	position: relative;
-	z-index: 0;
 
-	& label a {
-		border: 1px solid lime;
-		flex: 1;
-	}
+  /****** Borders ******/
 
-	& li {
-		border-radius: 0;
-		border-width: 0 0 0 1px;
-		position: static;
-	}
+    & li
+    { border-width: 0 0 0 1px; }
 
-	& li:first-child {
-		border-radius: 0;
-		border-width: 0;
-	}
+    & > ul,
+    & > menu,
+    & li > ul,
+    & li > menu,
+    & li:first-child
+    { border-width: 0; }
 
-	& li:has(menu):hover > label,
-	& li:has(ul):hover > label
-	{ flex: 0; }
+    & li:has(label):hover > menu,
+    & li:has(label):hover > ul,
+    & label:has(input:checked) + menu,
+    & label:has(input:checked) + ul
+    { border: 1px solid var(--border-color); }
 
-	& li:has(menu):hover > menu,
-	& li:has(ul):hover > ul
-	{
-		flex: 2;
-		max-height: 300vh;
-	}
+    & li,
+    & li li:first-child
+    { border-radius: 0 }
 
-	& label:has(input:checked) + menu,
-	& label:has(input:checked) + ul,
-	& li:has(label):hover > menu,
-	& li:has(label):hover > ul
-	{
-		border: 1px solid var(--border-color);
-		max-height: 300vh;
-		overflow: visible;
-		z-index: 100;
-	}
+    & menu,
+    & ul
+    { border-radius: .5rem }
 
-	& li:has(label):hover > label > input[type=checkbox],
-	& li:has(label):hover > label > input[type=radio] {
-		transform: rotate(90deg);
-	}
+    & > menu > li:first-child,
+    & > ul > li:first-child
+    { border-radius: .5rem 0 0 .5rem }
 
-	& label + menu,
-	& label + ul
-	{
-		left: 0;
-		max-height: 0;
-		overflow: hidden;
-		position: absolute;
-		top: var(--menu-height);
-		width: 100%;
-		z-index: -1;
-	}
+    & > menu > li:last-child,
+    & > ul > li:last-child
+    { border-radius: 0 .5rem .5rem 0 }
 
-	& li > menu > li,
-	& li > menu > ul
-	{
-		width: max-content;
-		min-width: auto;
-	}
+  /****** Structure ******/
 
-	& menu,
-	& ul
-	{
-		border-radius: 1rem;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		box-shadow: 2px 2px 10px black;
-	}
+    & label {
+      flex: 1;
+      justify-content: center;
+    }
 
-	& menu > li,
-	& ul > li
-	{
-		position: static;
-	}
+    & label:has(input):hover,
+    & label:has(input:checked)
+    { flex: 1; }
 
-} /** wijit-menu.ribbon **/
+    & label:has(input:checked) + menu,
+    & label:has(input:checked) + ul
+    {
+      flex: 1;
+      max-height: 300vh;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    & li > menu,
+    & li > ul {
+      left: 0;
+      overflow: hidden;
+      position: absolute;
+      top: 99%;
+      width: 100%;
+    }
+
+    & menu,
+    & ul
+    {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: visible;
+      position: relative;
+    }
+
+} /** .ribbon **/
 
 wijit-menu.oldschool {
-	align-items: start;
-	background-color: transparent;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	position: relative;
-	z-index: 1;
 
-	/*> li:last-child {
-		border-width: 0;
-	}*/
+  /****** Borders ******/
 
-	/*& label a {
-		flex: 1;
-	}*/
+    & li:has(label):hover > menu,
+    & li:has(label):hover > ul,
+    & label:has(input:checked) + menu,
+    & label:has(input:checked) + ul
+    { border: 1px solid var(--border-color); }
 
-	/*& > li {
-		border-radius: 0;
-		border-width: 0 1px 0 0;
-		position: relative;
-		overflow: visible;
-	}*/
+    & > menu > li,
+    & > ul > li
+    { border-width: 0 0 0 1px; }
 
-	/*& li li:first-child {
-		border-radius: 1rem 1rem 0 0;
-	}*/
+    & li
+    { border-width: 0 0 1px 0; }
 
-	& label:has(input:checked) + menu,
-	& label:has(input:checked) + ul,
-	& li:has(label):hover > menu,
-	& li:has(label):hover > ul
-	{
-		border: 1px solid var(--border-color);
-		max-height: 1000vh;
-		overflow: visible;
-		z-index: 100;
-	}
+    & > ul,
+    & > menu,
+    & li > ul,
+    & li > menu,
+    & > menu > li:first-child,
+    & > ul > li:first-child
+    { border-width: 0; }
 
-	/*& li:has(label):hover > label > input[type=checkbox],
-	& li:has(label):hover > label > input[type=radio] {
-		transform: rotate(90deg);
-	}*/
+    & li,
+    & li li:first-child
+    { border-radius: 0 }
 
-	& li > menu,
-	& li > ul
-	{
-		left: 0;
-		max-height: 0;
-		min-width: 100%;
-		overflow: hidden;
-		position: absolute;
-		top: var(--menu-height);
-		z-index: -1;
-	}
+    & > menu > li:first-child,
+    & > ul > li:first-child
+    { border-radius: .5rem 0 0 .5rem }
 
-	& li > menu > li,
-	& li > ul > li
-	{
-		border-radius: 0;
-	}
+    & > menu > li:last-child,
+    & > ul > li:last-child
+    { border-radius: 0 .5rem .5rem 0 }
 
-	& li > menu > li > menu,
-	& li > ul > li > ul
-	{
-		left: 100%;
-		top: -100%;
-	}
+    & menu,
+    & ul
+    { border-radius: .5rem }
 
-	& menu,
-	& ul
-	{
-		border-radius: 1rem;
-		box-shadow: 2px 2px 10px black;
-	}
+  /****** Structure ******/
+    & label {
+      flex: 1;
+      justify-content: start;
+    }
 
-	& menu > li,
-	& ul > li,
-	{
-		position: relative;
-		overflow: visible;
-	}
+    & label:has(input):hover,
+    & label:has(input:checked)
+    { flex: 1; }
 
-} /** wijit-menu.oldschool **/
+    & label:has(input:checked) + menu,
+    & label:has(input:checked) + ul
+    {
+      flex: 1;
+      max-height: 300vh;
+      overflow: visible;
+    }
+
+    & li > menu,
+    & li > ul {
+      flex-direction: column;
+      overflow: hidden;
+      position: absolute;
+      z-index: 1;
+    }
+
+    & > menu,
+    & > ul {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: visible;
+      flex-direction: row;
+    }
+
+} /** .oldschool **/
+
+} /** @layer **/

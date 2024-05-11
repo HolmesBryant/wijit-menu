@@ -1,10 +1,10 @@
 body {
   --bg1-color: rgb(250, 250, 250);
-  --bg2-color: #f2f2f2;
+  --bg2-color: whitesmoke;
   --bg3-color: white;
   --border-color: silver;
   --text-color: dimgray;
-  --accent: lightsalmon;
+  --accent: DarkTurquoise;
   --accent-text: rgb(40, 40, 40);
 
   background: var(--bg1-color);
@@ -17,7 +17,6 @@ body {
   margin: auto;
   max-width: 1600px;
   padding: 1rem;
-/*  width: 100vw;*/
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,24 +44,24 @@ body {
   section,
   summary,
   details
-  { background-color: var(--bg2-color) }
+  { background: var(--bg2-color) }
 
   .card,
   button,
   pre
-  { background-color: var(--bg3-color) }
+  { background: var(--bg3-color) }
 
   button:hover,
   button.active-tab,
   summary:hover,
   details[open] > summary
-  { background-color: var(--accent) }
+  { background: var(--accent) }
 
 /**** Borders ****/
   button,
   details,
   pre,
-  .card
+  section
   { border: 1px solid var(--border-color); }
 
   article,
@@ -76,10 +75,20 @@ body {
   wijit-tabs button
   { border-radius: .5rem .5rem 0 0 }
 
+/**** Shadows ****/
+  summary:hover,
+  details[open] summary
+  { box-shadow: 2px 2px 5px dimgray }
+
+  summary:active,
+  details[open] summary:active
+  { box-shadow: inset 2px 2px 5px dimgray }
+
 /**** Text ****/
-  a {
-    color: var(--accent);
-  }
+  a,
+  h2,
+  h3
+  { color: var(--accent); }
 
   button
   { color: var(--text-color) }
