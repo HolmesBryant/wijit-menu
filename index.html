@@ -5,21 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Menu</title>
     <script type="module" src="extra/scripts.js"></script>
+    <script type="module" src="extra/wijit-form.min.js"></script>
     <script type="module" src="src/wijit-menu.js"></script>
+    <script type="module" src="extra/wijit-code.min.js"></script>
     <link rel="stylesheet" href="extra/styles.css">
     <style>
+        wijit-menu {
+            --accent: lightsalmon;
+            opacity: 0;
+            transition: all .5s;
+        }
+
+        wijit-menu:defined {
+            opacity: 1;
+        }
+
         wijit-menu a { color: var(--text-color); }
         wijit-menu a:hover { color: var(--accent); }
 
-        wijit-menu {
-            --accent: lightsalmon;
-          }
-
-      @media (prefers-color-scheme: dark) {
-        wijit-menu {
-          --accent: darkorange;
+        @media (prefers-color-scheme: dark) {
+            wijit-menu {
+            --accent: darkorange;
         }
-      }
     </style>
 </head>
 <body>
@@ -33,13 +40,348 @@
         <div></div>
     </details>
 
-    <section id="demo-form">
+    <h2>Demo</h2>
+
+    <section id="demo-section">
+        <div class="flex1">
+            <wijit-form>
+            <form>
+            <wijit-menu>
+                <menu>
+                    <li>
+                        <section class="row">
+                        <div class="row center">
+                            <label for="prop-expand">
+                                expand
+                            </label>
+                            <input
+                            type="checkbox"
+                            id="prop-expand"
+                            title="Expand/Close the whole menu"
+                            onchange="change(event, 'expand')">
+                        </div>
+
+                        <div>
+                            <button
+                            class="primary"
+                            type="reset"
+                            title="Reset form to default values"
+                            onclick="location.reload()">
+                                Reset
+                            </button>
+                        </div>
+                        </section>
+                    </li>
+                    <li>
+                    Attributes
+                        <menu>
+                            <li>
+                                <div class="row">
+                                    <label for="attr-nohover">
+                                        nohover
+                                    </label>
+                                    <input
+                                    type="checkbox"
+                                    id="attr-nohover"
+                                    title="disable hover for ribbon and oldSchool menus"
+                                    onchange="change(event, 'nohover')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div>
+                                    <label for="attr-type">
+                                        type
+                                    </label>
+                                    <select
+                                    id="attr-type"
+                                    title="The menu style"
+                                    onchange="change(event, 'type')">
+                                        <option>default</option>
+                                        <option>ribbon</option>
+                                        <option>oldschool</option>
+                                        <option>sitemap</option>
+                                        <option value="">null</option>
+                                    </select>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div>
+                                    <label for="attr-height">
+                                        height
+                                    </label>
+                                    <select
+                                    id="attr-height"
+                                    title="Influences theight of each list item, or whole menu for 'sitemap'"
+                                    onchange="change(event, 'height')">
+                                        <option value="auto">auto (default)</option>
+                                        <option>45px</option>
+                                        <option>6rem</option>
+                                        <option>10vh</option>
+                                    </select>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div>
+                                    <label for="attr-speed">
+                                        speed
+                                    </label>
+                                    <select
+                                    id="attr-speed"
+                                    title="The duration of transitions"
+                                    onchange="change(event, 'speed')">
+                                        <option value=".5s">.5s (default)</option>
+                                        <option>0</option>
+                                        <option>100ms</option>
+                                        <option>2</option>
+                                    </select>
+                                </div>
+                            </li>
+                        </menu>
+                    </li>
+
+                    <li>
+                    CSS Properties
+                        <menu>
+                            <li>
+                                <div>
+                                    <label for="css-height">
+                                        --height
+                                    </label>
+                                    <select
+                                    id="css-height"
+                                    title="Influences the height of each list item, or whole menu for 'sitemap'"
+                                    onchange="change(event, '--height')">
+                                        <option value="auto">auto (default)</option>
+                                        <option>45px</option>
+                                        <option>6rem</option>
+                                        <option>10vh</option>
+                                    </select>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div>
+                                    <label for="css-speed">
+                                        speed
+                                    </label>
+                                    <select
+                                    id="css-speed"
+                                    title="The duration of transitions"
+                                    onchange="change(event, '--speed')">
+                                        <option value=".5s">.5s (default)</option>
+                                        <option>0</option>
+                                        <option>100ms</option>
+                                        <option>2</option>
+                                    </select>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <label for="css-speed">
+                                        --bg1-color
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-bg1"
+                                    title="main background color"
+                                    onchange="change(event, '--bg1-color')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <label for="css-bg2">
+                                        --bg2-color
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-bg2"
+                                    title="Secondary background color"
+                                    onchange="change(event, '--bg2-color')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <label for="css-border">
+                                        --border-color
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-border"
+                                    title="Color of visible borders"
+                                    onchange="change(event, '--border-color')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <label for="css-text">
+                                        --text-color
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-text"
+                                    title="Text color"
+                                    onchange="change(event, '--text-color')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <label for="css-accent">
+                                        --accent
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-accent"
+                                    title="Color of accents and hover/click effects"
+                                    onchange="change(event, '--accent')">
+                                </div>
+                            </li>
+                        </menu>
+                    </li>
+                </menu>
+            </wijit-menu>
+        </form>
+        </wijit-form>
+        </div>
+
+        <div class="flex2">
+            <wijit-menu id="demo">
+                <ul>
+                    <li>Section One
+                        <ul>
+                            <li>
+                            Subsection One One
+                                <menu>
+                                    <li>
+                                        <a href="#">Link One</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Two</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Three</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Four</a>
+                                    </li>
+                                </menu>
+                            </li>
+                            <li>
+                            Subsection One Two
+                                <menu>
+                                    <li>
+                                        <a href="#">Link One</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Two</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Three</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Four</a>
+                                    </li>
+                                </menu>
+                            </li>
+                            <li>
+                            Subsection One three
+                                <menu>
+                                    <li>
+                                        <a href="#">Link One</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Two</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Three</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Link Four</a>
+                                    </li>
+                                </menu>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>Section Two
+                        <ul>
+                            <li><a href="#">Link Two One</a></li>
+                            <li><a href="#">Link Two Two</a></li>
+                            <li><a href="#">Link Two Three</a></li>
+                        </ul>
+                    </li>
+
+                    <li>Section Thee
+                        <ul>
+                            <li><a href="#">Link Three One</a></li>
+                            <li><a href="#">Link Three Two</a></li>
+                            <li>
+                            Subsection Three
+                                <ul>
+                                    <li>
+                                        <a href="#">Subsection Link One</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Subsection Link Two</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Subsection Link Three</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Link Three Two</a></li>
+                        </ul>
+                    </li>
+
+                    <li>Section Four
+                        <ul>
+                            <li><a href="#">Link Four One</a></li>
+                            <li><a href="#">Link Four Two</a></li>
+                            <li><a href="#">Link Four Three</a></li>
+                        </ul>
+                    </li>
+
+                    <li>Section Five
+                        <ul>
+                            <li><a href="#">Link Five One</a></li>
+                            <li><a href="#">Link Five Two</a></li>
+                            <li><a href="#">Link Five Three</a></li>
+                        </ul>
+                    </li>
+
+                    <li>Section Six
+                        <ul>
+                            <li><a href="#">Link Six One</a></li>
+                            <li><a href="#">Link Six Two</a></li>
+                            <li><a href="#">Link Six Three</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </wijit-menu>
+        </div>
     </section>
 
-    <section id="demo">
-    </section>
+    <!-- <section class="column">
+        <wijit-code highlight id="demo-changes">
+            <textarea>
+            <wijit-menu>
+            </textarea>
+        </wijit-code>
 
-    <section id="demo-changes"></section>
+        <wijit-code highlight>
+            <textarea>&nbsp;
+                    <menu>...</menu>
+                </wijit-menu>
+            </textarea>
+        </wijit-code>
+    </section> -->
 
     <h2>Examples</h2>
 
@@ -202,20 +544,38 @@
                 Level One Two
                     <menu>
                         <li>
-                            <a href="#">Level 2.1</a>
+                        Level 2.1
                             <menu>
-                                <li> Level 2.1.1 </li>
-                                <li> <a href="#">Level 2.1.2</a> </li>
+                                <li>
+                                    <a href="#">Level 2.1.1</a>
+                                </li>
+
+                                <li>
+                                    <a href="#">Level 2.1.2</a>
+                                </li>
+
                                 <li><a href="#">Level 2.1.3</a></li>
                             </menu>
                         </li>
-                        <li> <a href="#">Level 2.2</a> </li>
+
                         <li>
-                            Level 2.3
+                            <a href="#">Level 2.2</a>
+                        </li>
+
+                        <li>
+                        Level 2.3
                             <menu>
-                                <li><a href="#">Level 2.3.1</a></li>
-                                <li> Level 2.3.2 </li>
-                                <li><a href="#">Level 2.3.3</a></li>
+                                <li>
+                                    <a href="#">Level 2.3.1</a>
+                                </li>
+
+                                <li>
+                                    <a href="#">Level 2.3.2</a>
+                                </li>
+
+                                <li>
+                                    <a href="#">Level 2.3.3</a>
+                                </li>
                             </menu>
                         </li>
                     </menu>
@@ -224,26 +584,30 @@
                 Level One Three
                     <menu>
                         <li>
-                            <a href="#">About the Legacy Project</a>
+                        Level 2.1
                             <menu>
                                 <li>
-                                    About the Legacy Project
+                                    <a href="#">Level 2.1.1</a>
                                 </li>
                                 <li>
-                                    <a href="#">About the Legacy Project</a>
+                                    <a href="#">Level 2.1.2</a>
                                 </li>
-                                <li><a href="#">About the Legacy Project</a></li>
+                                <li>
+                                    <a href="#">Level 2.1.3</a>
+                                </li>
                             </menu>
                         </li>
                         <li>
-                            <a href="#">About the Legacy Project</a>
+                            <a href="#">Level 2.2</a>
                         </li>
                         <li>
-                            About the Legacy Project
+                        Level 2.3
                             <menu>
-                                <li><a href="#">About the Legacy Project</a></li>
                                 <li>
-                                    About the Legacy Project
+                                    <a href="#">Level 2.3.1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Level 2.3.2</a>
                                 </li>
                                 <li><a href="#">Level 2.3.3</a></li>
                             </menu>

@@ -175,7 +175,7 @@ body {
     flex-wrap: wrap;
     gap: 1rem;
     margin: 0 auto 1rem auto;
-    max-width: 99vw;
+    width: 100%;
     padding: 1rem;
   }
 
@@ -202,6 +202,14 @@ body {
 
   .end {
     align-items: end;
+  }
+
+  .flex1 {
+    flex: 1;
+  }
+
+  .flex2 {
+    flex: 2;
   }
 
   .row {
