@@ -1,6 +1,8 @@
 # Wijit-Menu Web Component
 **A web component that displays a menu in various styles from a user-provided `menu` or `ul` list.**
 
+Demo: https://holmesbryant.github.io/wijit-menu/
+
 ## Features
 
 - Converts a plain `ul` or `menu` list into an expandable, hoverable, responsive HTML menu.
