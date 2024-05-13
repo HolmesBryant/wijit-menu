@@ -1,21 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wijit-Menu</title>
+    <meta name="description" content="A web component that displays an HTML menu using a user-supplied ul or menu list">
     <script type="module" src="extra/scripts.js"></script>
     <script type="module" src="extra/wijit-form.min.js"></script>
-    <script type="module" src="src/wijit-menu.js"></script>
+    <!-- <script type="module" src="src/wijit-menu.js"></script> -->
+    <script type="module" src="dist/wijit-menu.min.js"></script>
     <script type="module" src="extra/wijit-code.min.js"></script>
     <link rel="stylesheet" href="extra/styles.css">
+
     <style>
+
+        wijit-code,
+        wijit-form,
         wijit-menu {
             --accent: lightsalmon;
             opacity: 0;
             transition: all .5s;
         }
 
+        wijit-code:defined,
+        wijit-form:defined,
         wijit-menu:defined {
             opacity: 1;
         }
@@ -85,7 +93,9 @@
                                     id="attr-nohover"
                                     title="disable hover for ribbon and oldSchool menus"
                                     onchange="change(event, 'nohover')">
+                                    <small> Disable hover for ribbon and oldschool menus</small>
                                 </div>
+
                             </li>
 
                             <li>
@@ -101,8 +111,9 @@
                                         <option>ribbon</option>
                                         <option>oldschool</option>
                                         <option>sitemap</option>
-                                        <option value="">null</option>
+                                        <option>custom</option>
                                     </select>
+                                    <small>The menu style</small>
                                 </div>
                             </li>
 
@@ -113,13 +124,16 @@
                                     </label>
                                     <select
                                     id="attr-height"
-                                    title="Influences theight of each list item, or whole menu for 'sitemap'"
+                                    title="Affects height of list items, or menu for 'sitemap' EXCEPT in flex or grid containers"
                                     onchange="change(event, 'height')">
                                         <option value="auto">auto (default)</option>
                                         <option>45px</option>
                                         <option>6rem</option>
                                         <option>10vh</option>
                                     </select>
+                                    <small>
+                                        Affects height of list items except for the 'sitemap' type.
+                                    </small>
                                 </div>
                             </li>
 
@@ -137,6 +151,9 @@
                                         <option>100ms</option>
                                         <option>2</option>
                                     </select>
+                                    <small>
+                                        The duration of transitions
+                                    </small>
                                 </div>
                             </li>
                         </menu>
@@ -152,13 +169,16 @@
                                     </label>
                                     <select
                                     id="css-height"
-                                    title="Influences the height of each list item, or whole menu for 'sitemap'"
                                     onchange="change(event, '--height')">
                                         <option value="auto">auto (default)</option>
                                         <option>45px</option>
                                         <option>6rem</option>
                                         <option>10vh</option>
                                     </select>
+
+                                    <small>
+                                        Affects height of list items except for the 'sitemap' type.
+                                    </small>
                                 </div>
                             </li>
 
@@ -169,77 +189,135 @@
                                     </label>
                                     <select
                                     id="css-speed"
-                                    title="The duration of transitions"
                                     onchange="change(event, '--speed')">
                                         <option value=".5s">.5s (default)</option>
                                         <option>0</option>
                                         <option>100ms</option>
                                         <option>2</option>
                                     </select>
+
+                                    <small>
+                                        The duration of transitions
+                                    </small>
                                 </div>
                             </li>
 
                             <li>
                                 <div class="row reverse">
+                                    <small>
+                                        Background color of main menu
+                                    </small>
                                     <label for="css-speed">
                                         --bg1-color
                                     </label>
                                     <input
                                     type="color"
                                     id="css-bg1"
-                                    title="main background color"
                                     onchange="change(event, '--bg1-color')">
                                 </div>
                             </li>
 
                             <li>
                                 <div class="row reverse">
+                                    <small>
+                                        Secondary background color
+                                    </small>
                                     <label for="css-bg2">
                                         --bg2-color
                                     </label>
                                     <input
                                     type="color"
                                     id="css-bg2"
-                                    title="Secondary background color"
                                     onchange="change(event, '--bg2-color')">
                                 </div>
                             </li>
 
                             <li>
                                 <div class="row reverse">
+                                    <small>
+                                        Tertiary background color
+                                    </small>
+                                    <label for="css-bg3">
+                                        --bg3-color
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-bg3"
+                                    onchange="change(event, '--bg3-color')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <small>
+                                        Background color on hover
+                                    </small>
+                                    <label for="css-bghover">
+                                        --hover-bg
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-bghover"
+                                    onchange="change(event, '--hover-bg')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <small>
+                                        Background color on click
+                                    </small>
+                                    <label for="css-bgactive">
+                                        --active-bg
+                                    </label>
+                                    <input
+                                    type="color"
+                                    id="css-bgactive"
+                                    onchange="change(event, '--active-bg')">
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="row reverse">
+                                    <small>
+                                        Color of visible borders
+                                    </small>
                                     <label for="css-border">
                                         --border-color
                                     </label>
                                     <input
                                     type="color"
                                     id="css-border"
-                                    title="Color of visible borders"
                                     onchange="change(event, '--border-color')">
                                 </div>
                             </li>
 
                             <li>
                                 <div class="row reverse">
+                                    <small>Text color</small>
                                     <label for="css-text">
                                         --text-color
                                     </label>
                                     <input
                                     type="color"
                                     id="css-text"
-                                    title="Text color"
                                     onchange="change(event, '--text-color')">
                                 </div>
                             </li>
 
                             <li>
                                 <div class="row reverse">
+                                    <small>
+                                        Color of accents and hover/click effects
+                                    </small>
+
                                     <label for="css-accent">
                                         --accent
                                     </label>
+
                                     <input
                                     type="color"
                                     id="css-accent"
-                                    title="Color of accents and hover/click effects"
                                     onchange="change(event, '--accent')">
                                 </div>
                             </li>
@@ -258,7 +336,7 @@
                         <ul>
                             <li>
                             Subsection One One
-                                <menu>
+                                <ul>
                                     <li>
                                         <a href="#">Link One</a>
                                     </li>
@@ -271,11 +349,11 @@
                                     <li>
                                         <a href="#">Link Four</a>
                                     </li>
-                                </menu>
+                                </ul>
                             </li>
                             <li>
                             Subsection One Two
-                                <menu>
+                                <ul>
                                     <li>
                                         <a href="#">Link One</a>
                                     </li>
@@ -288,11 +366,11 @@
                                     <li>
                                         <a href="#">Link Four</a>
                                     </li>
-                                </menu>
+                                </ul>
                             </li>
                             <li>
                             Subsection One three
-                                <menu>
+                                <ul>
                                     <li>
                                         <a href="#">Link One</a>
                                     </li>
@@ -305,7 +383,7 @@
                                     <li>
                                         <a href="#">Link Four</a>
                                     </li>
-                                </menu>
+                                </ul>
                             </li>
                         </ul>
                     </li>
@@ -336,7 +414,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li><a href="#">Link Three Two</a></li>
+                            <li><a href="#">Link Three Three</a></li>
                         </ul>
                     </li>
 
@@ -368,7 +446,7 @@
         </div>
     </section>
 
-    <!-- <section class="column">
+    <section class="column">
         <wijit-code highlight id="demo-changes">
             <textarea>
             <wijit-menu>
@@ -381,12 +459,23 @@
                 </wijit-menu>
             </textarea>
         </wijit-code>
-    </section> -->
+    </section>
 
     <h2>Examples</h2>
 
     <section>
-    <header><h3>Oldschool Menu</h3>
+    <header> <h3>Oldschool Menu</h3> </header>
+        <div class="card">
+            <wijit-code highlight>
+                <textarea>
+                    <wijit-menu type="oldschool">
+                        <ul>
+                            ....
+                        </ul>
+                    </wijit-menu>
+                </textarea>
+            </wijit-code>
+        </div>
         <wijit-menu type="oldschool">
             <ul>
                 <li><a href="#">First Link</a></li>
@@ -437,6 +526,17 @@
 
     <section>
     <header><h3>Ribbon Menu</h3></header>
+
+        <div class="card">
+            <wijit-code highlight>
+                <textarea>
+                    <wijit-menu type="ribbon">
+                        <ul>....</ul>
+                    </wijit-menu>
+                </textarea>
+            </wijit-code>
+        </div>
+
         <wijit-menu type="ribbon">
             <ul>
                 <li><a href="#">First Link</a></li>
@@ -487,6 +587,17 @@
 
     <section>
     <header><h3>Default Menu</h3></header>
+
+        <div class="card">
+            <wijit-code highlight>
+                <textarea>
+                    <wijit-menu>
+                        <ul>....</ul>
+                    </wijit-menu>
+                </textarea>
+            </wijit-code>
+        </div>
+
         <wijit-menu>
             <menu>
                 <li><a href="#">First Link</a></li>
@@ -537,6 +648,17 @@
 
     <section>
     <header><h3>Sitemap</h3></header>
+
+        <div class="card">
+            <wijit-code highlight>
+                <textarea>
+                    <wijit-menu type="sitemap">
+                        <ul>....</ul>
+                    </wijit-menu>
+                </textarea>
+            </wijit-code>
+        </div>
+
         <wijit-menu type="sitemap">
             <menu>
                 <li><a href="#">Level One One</a></li>

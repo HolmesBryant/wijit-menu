@@ -150,17 +150,15 @@ body {
     white-space:pre-wrap;
   }
 
-  div
-  { align-items: center; }
-
   fieldset > wijit-code
     { width: 100%; }
 
   h2
   { margin-left: 1rem; }
 
-  header
-  { flex: 0; }
+  header {
+    flex: 0 0 100%;
+  }
 
   ol, ul
   {
@@ -179,6 +177,10 @@ body {
     padding: 1rem;
   }
 
+  small {
+    padding: 2px;
+  }
+
   summary {
     padding: 1rem;
     position: sticky;
@@ -189,11 +191,9 @@ body {
   .card {
     flex: 1;
     padding: 1rem;
+    overflow: auto;
   }
 
-  header {
-    flex: 0 0 100%;
-  }
 
   .column {
     flex-direction: column;

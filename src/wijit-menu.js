@@ -48,6 +48,12 @@ export class WijitMenu extends HTMLElement {
   #observer;
 
   /**
+   * The id of the style tag for the default css styles
+   * @type {String}
+   */
+  defaultStyleId = 'wijit-menu-styles';
+
+  /**
    * @static
    * @typedef {Set<string | boolean | null>} AllowedValues
    * @type {Record<string, AllowedValues>}
@@ -290,7 +296,7 @@ export class WijitMenu extends HTMLElement {
 
     if (value && value !== '') {
       elem.classList.add(value);
-      if (value !== 'sitemap') elem.classList.add('default');
+      if (value !== 'sitemap' && value !== 'custom') elem.classList.add('default');
     }
   }
 
@@ -298,22 +304,21 @@ export class WijitMenu extends HTMLElement {
    * Add stylesheet to document head
    */
   addStyles() {
-    document.head.append(this.defaultStyles());
+    const style = document.head.querySelector(`#${this.defaultStyleId}`)
+
+    if (!style) document.head.append(this.defaultStyles());
   }
 
   /**
    * Add event listener to menu. If click target is a link, close the menu.
    */
   addListeners() {
-    if (this.type === "custom") {
       this.addEventListener('click', event => {
         if (event.target.localName === 'a') this.closeMenu();
+        if (event.target.localName === 'label') {
+          this.closeAllBut(event.target);
+        }
       }, { signal:this.#abortController.signal } );
-    } else {
-      this.addEventListener('click', event => {
-        if (event.target.localName === 'a') this.closeMenu();
-      }, { signal:this.#abortController.signal } );
-    }
   }
 
   /**
@@ -342,6 +347,24 @@ export class WijitMenu extends HTMLElement {
   closeMenu() {
     for (const input of this.#inputs) {
       input.checked = false;
+    }
+  }
+
+  /**
+   * Close everything but `elem`
+   * @param  {HTMLElement} elem   - The element whose parent menu to keep open
+   */
+  closeAllBut(elem) {
+    const menu = elem.closest('ul') || elem.closest('menu')
+    const open = menu.parentElement.querySelector('input');
+    const thisInput = elem.querySelector('input');
+
+    for (const input of this.#inputs) {
+      if (input !== open && input !== thisInput) {
+        input.checked = false;
+      } else if (menu.parentElement === this && input !== thisInput) {
+        input.checked = false;
+      }
     }
   }
 
@@ -391,7 +414,8 @@ export class WijitMenu extends HTMLElement {
    */
   defaultStyles() {
     const style = document.createElement('style');
-    style.innerText = `
+    style.id = this.defaultStyleId;
+    style.textContent = `
       @layer wijit-menu {
 
       wijit-menu {
@@ -399,10 +423,12 @@ export class WijitMenu extends HTMLElement {
         --bg2-color: whitesmoke;
         --bg3-color: white;
         --border-color: silver;
+        --hover-bg: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+        --active-bg: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
         --text-color: rgb(60,60,60);
         --accent: skyblue;
-        --menu-height: auto;
-        --speed: .75s;
+        --height: auto;
+        --speed: .5s;
 
         width: 100%;
       }
@@ -465,10 +491,10 @@ export class WijitMenu extends HTMLElement {
           width: 100%;
         }
 
-        wijit-menu .oldschool li li > menu,
-        wijit-menu .oldschool li li > ul {
-          left: 0;
-          top: 100%;
+        wijit-menu .oldschool menu > li > menu,
+        wijit-menu .oldschool ul > li > ul {
+          left: 0 !important;
+          top: 100% !important;
         }
       }
 
@@ -504,24 +530,20 @@ export class WijitMenu extends HTMLElement {
       /****** Backgrounds ******/
         background: var(--bg1-color);
 
-        & li menu,
-        & li ul,
-        & li menu menu menu,
-        & li ul ul ul
+        & li > ul
         { background: var(--bg2-color) }
 
-        & li menu menu,
-        & li ul ul
+        & ul > li > ul
         { background: var(--bg3-color) }
 
         & li:not(:has(input:checked)):hover
         {
-          background-image: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+          background: var(--hover-bg);
         }
 
         & li:not(:has(input:checked)):active
         {
-          background-image: linear-gradient(to top, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+          background: var(--active-bg);
         }
 
       /****** Borders ******/
@@ -600,6 +622,7 @@ export class WijitMenu extends HTMLElement {
         padding: 0;
 
         & a {
+          align-content: center;
           text-align: left;
           flex: 1;
           padding: .5rem;
@@ -661,10 +684,10 @@ export class WijitMenu extends HTMLElement {
         }
 
         & li {
-          align-items: center;
+          align-items: normal;
           box-sizing: border-box;
           display: flex;
-          min-height: var(--menu-height);
+          min-height: var(--height);
           padding-left: 1rem;
         }
 
@@ -870,6 +893,7 @@ export class WijitMenu extends HTMLElement {
           & li > menu,
           & li > ul {
             flex-direction: column;
+            left: 0;
             overflow: hidden;
             position: absolute;
             top: 100%;
@@ -896,7 +920,7 @@ export class WijitMenu extends HTMLElement {
       } /** default **/
 
       wijit-menu .sitemap {
-        --height: var(--menu-height);
+        --height: var(--height);
 
         /****** Borders ******/
           border-radius: 0;
@@ -1006,7 +1030,7 @@ export class WijitMenu extends HTMLElement {
 
   set height(value) {
     this.#height = value;
-    this.style.setProperty('--menu-height', value);
+    this.style.setProperty('--height', value);
   }
 
   get nohover() { return this.#nohover; }
