@@ -7,6 +7,8 @@
  */
 
 export class WijitMenu extends HTMLElement {
+  #content;
+
   /**
    * @private
    */
@@ -68,7 +70,7 @@ export class WijitMenu extends HTMLElement {
    * @static
    * @type {string[]}
    */
-  static observedAttributes = ['expand', 'height', 'nohover','speed', 'type'];
+  static observedAttributes = ['content', 'expand', 'height', 'nohover','speed', 'type'];
 
   /**
    * @constructor
@@ -136,6 +138,8 @@ export class WijitMenu extends HTMLElement {
         }
       }
     }
+
+    this.replaceClassName(this.type);
   }
 
   /**
@@ -280,21 +284,13 @@ export class WijitMenu extends HTMLElement {
    */
   replaceClassName(value) {
     const elem = this.querySelector('menu, ul');
-    if (!elem) return false;
+    if (!elem) return;
 
     for (const style of WijitMenu.allowed.type) {
-      if (elem.classList.contains(style)) {
-        if (value && value !== "") {
-          elem.classList.replace(style, value);
-        } else {
-          elem.classList.remove(style);
-        }
-      } else if (!value || value === "") {
-        if (style && style !== "") elem.classList.remove(style);
-      }
+      if (style) elem.classList.remove(style);
     }
 
-    if (value && value !== '') {
+    if (value) {
       elem.classList.add(value);
       if (value !== 'sitemap' && value !== 'custom') elem.classList.add('default');
     }
@@ -430,7 +426,10 @@ export class WijitMenu extends HTMLElement {
         --height: auto;
         --speed: .5s;
 
+        display: inline-block;
+        position: relative;
         width: 100%;
+        z-index: 1;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -530,21 +529,19 @@ export class WijitMenu extends HTMLElement {
       /****** Backgrounds ******/
         background: var(--bg1-color);
 
-        & li > ul
+        & li > ul,
+        & li > menu
         { background: var(--bg2-color) }
 
-        & ul > li > ul
+        & ul > li > ul,
+        & menu > li > menu
         { background: var(--bg3-color) }
 
         & li:not(:has(input:checked)):hover
-        {
-          background: var(--hover-bg);
-        }
+        { background: var(--hover-bg); }
 
         & li:not(:has(input:checked)):active
-        {
-          background: var(--active-bg);
-        }
+        { background: var(--active-bg); }
 
       /****** Borders ******/
 
@@ -1002,6 +999,34 @@ export class WijitMenu extends HTMLElement {
     `;
 
     return style;
+  }
+
+  get content() { return this.#content; }
+
+  set content(value) {
+    let item = window;
+    let error = false;
+    const parts = value.split('.');
+    for (const part of parts) {
+      try {
+        item = item[part];
+      } catch {
+        error = `window.${value} is undefined`;
+      }
+    }
+
+    if (error) {
+      console.error(error);
+    } else {
+      for (const li of item.querySelectorAll('li')) {
+        if (this.hasChildMenu(li)) {
+          if (!this.hasLabel(li)) this.addLabel(li);
+        }
+      }
+
+      this.append(item.cloneNode(true));
+      this.replaceClassName(this.type);
+    }
   }
 
   get expand() { return this.#expand; }

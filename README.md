@@ -3,6 +3,11 @@
 
 Demo: https://holmesbryant.github.io/wijit-menu/
 
+## Change Log
+
+### v1.01
+Exposed a "content" attribute/property
+
 ## Features
 
 - Converts a plain `ul` or `menu` list into an expandable, hoverable, responsive HTML menu.
@@ -53,7 +58,27 @@ Add a `<menu>` or `<ul>` list inside the tags.
 
 **Important** Do not mix `<ul>` and `<menu>` in the same list. Use either `<ul>` OR `<menu>` for the whole list.
 
-## Attributes
+## Attributes / Properties
+
+Each of these may be used as an attribute/value pair on the custom tag itself or as a property of an instance of the component.
+
+### content (default: null)
+
+**Allowed values:** Globally available variable or string representing a global variable.
+
+If you wish to dynamically add a menu or ul list, you may set this attribute/property to a globally available variable that contains the list. When using this as an attribute/value pair, the variable must be available via `window[variable]`.
+    
+    /* scripts.js */
+    window.menulist = `
+        <menu>    
+        	<li><a href="#">Foo</a></li>
+            <li><a href="#">Bar</a></li>
+            <li><a href="#">Baz</a></li>
+        </menu>    
+    `;
+
+    <!-- index.html -->
+    <wijit-menu content="menulist"></wijit-menu>
 
 ### expand (default: false)
 
